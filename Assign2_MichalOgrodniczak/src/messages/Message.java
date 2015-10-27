@@ -102,4 +102,9 @@ public class Message implements java.io.Serializable{
 //        }
 //        return bytes;
     }
+
+
+    public String prettyPrint() {
+        return null;
+    }
 }

@@ -1,6 +1,5 @@
-import messages.CloseConnectionMessage;
-import messages.Message;
-import messages.PaymentsMessage;
+import messages.*;
+import utilities.MessageComms;
 import utilities.SQL_driver;
 
 import javax.swing.*;
@@ -10,12 +9,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.SQLException;
 
 
 /**
  * Created by witmi on 23/10/2015.
  */
 public class MyClientThread extends Thread {
+
     //The socket the client is connected through
     private Socket socket;
     //The ip address of the client
@@ -25,18 +26,31 @@ public class MyClientThread extends Thread {
     private DataOutputStream outputToClient;
 
     private String clientName;
-    private Server server;
+    private JTextArea jta;
 
-    // The Constructor for the client
-    public MyClientThread(Socket socket, int clientCtr, Server server) {
-        this.server = server;
+    private SQL_driver sqlDriver;
+
+    /**
+     * Client thread constructor
+     * @param socket socket at which client is connected to the server
+     * @param clientCtr counter, an ID of sorts of the client threads
+     * @param jta main text area in server GUI to display all communication
+     */
+    public MyClientThread(Socket socket, int clientCtr, JTextArea jta) {
+        this.jta    = jta;
         this.socket = socket;
         address     = socket.getInetAddress();
         clientName  = String.valueOf(clientCtr);
 
+//      Sets up DB connection
+//      This pattern follows Oracle JDBC Developer's Guide and Reference
+//      (https://docs.oracle.com/cd/A87860_01/doc/java.817/a83724/tips1.htm)
+        sqlDriver   = SQL_driver.defaultSqlDriverBuilder();
+        sqlDriver.connect();
+
         try {
-            inputFromClient = new DataInputStream(socket.getInputStream());
-            outputToClient = new DataOutputStream(socket.getOutputStream());
+            inputFromClient = new DataInputStream (socket.getInputStream());
+            outputToClient  = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,8 +61,8 @@ public class MyClientThread extends Thread {
     */
     public void run() {
         //synchronized keyword or locks could be used here but JTextArea.append() is ThreadSafe so there is no need,
-        //synch. example below (it`s it resource heavire and slower on runtime - tested 100 concurrent client connections)
-        server.jta.append("Client " + clientName + "'s hostname is: " + address.getHostName()   + "\n" +
+        //synch. example below (it`s it resource heavier and slower on runtime - tested 100 concurrent client connections)
+        jta.append("Client " + clientName + "'s hostname is: " + address.getHostName()   + "\n" +
                 "Client " + clientName + "'s IP address is: " + address.getHostAddress() + "\n");
         /*
         synchronized (jta) {
@@ -60,60 +74,64 @@ public class MyClientThread extends Thread {
 
         while (true) {
             try {
-                int length = inputFromClient.available();
-                if(length > 0){
-                    Message messageIn = readInMessage();
 
-                    if(messageIn instanceof CloseConnectionMessage)cleanUp();
+                if(inputFromClient.available() > 0){
+                    Message messageIn = MessageComms.readInMessage(inputFromClient);
+                    jta.append("Message from Client " + clientName + "\n" +
+                            messageIn.toString() + "\n");
+
                     Message response = handleMessage(messageIn);
 
-
+                    if(response == null){
+                        jta.append("Client " + clientName + " closed connection");
+                        cleanUp();
+                        break;
+                    }else {
+                        outputToClient.write(response.convertToBytes());
+                    }
 
                     System.out.println();
                 }
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
+                cleanUp();
+                break;
             }
         }
+
     }
 
-    private Message handleMessage(Message msg) {
-        if(msg instanceof CloseConnectionMessage) return null;
 
-        else if(msg instanceof PaymentsMessage){
-            PaymentsMessage paymentsMessage = (PaymentsMessage) msg;
-            String ss = server.sql_driver.getApplicantByID(paymentsMessage.getAccNUm());
-            System.out.println();
-        }
-        return null;
-    }
+
 
     /**
-     * reads in bytes from the input stream and returns a messages.Message object
+     * Handles
+     * @param msg
      * @return
      */
-    private Message readInMessage() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Message message = null;
+    private Message handleMessage(Message msg) {
+        if(msg == null) return new TextMessage("Error, please resend the request");
 
-        try {
-            while (inputFromClient.available() > 0) {
-                int i = inputFromClient.read();
-                if (i > -1) {
-                    baos.write(i);
-                }
+        else if(msg instanceof CloseConnectionMessage) return null;
+
+        else if(msg instanceof RepaymentsReqMessage){
+            RepaymentsReqMessage repaymentsReqMessage = (RepaymentsReqMessage) msg;
+
+            try {
+                String applicant = sqlDriver.getApplicantByID(repaymentsReqMessage.getAccountNumber());
+                if(applicant == null) return new TextMessage("User doesn't exist");
+                else                  return new RepaymentsRespMessage(applicant, repaymentsReqMessage);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return new TextMessage("Database connection error, please try again at later stage");
             }
 
-            message = Message.convertFromBytes(baos.toByteArray());
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
         }
-
-        return message;
+        System.out.println();
+        return null;
     }
 
 
@@ -125,8 +143,7 @@ public class MyClientThread extends Thread {
         try{
             socket.close();
         } catch (IOException e) {
-            System.out.println("Could not close socket");
-            System.exit(-1);
+            //ignore close exception
         }
     }
 }

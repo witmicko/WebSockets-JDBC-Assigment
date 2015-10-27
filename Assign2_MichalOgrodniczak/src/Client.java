@@ -4,8 +4,9 @@
 
 import messages.CloseConnectionMessage;
 import messages.Message;
-import messages.PaymentsMessage;
+import messages.RepaymentsReqMessage;
 import utilities.FormVerifier;
+import utilities.MessageComms;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -90,11 +91,10 @@ public class Client extends JFrame {
 
 
                 try {
-                    PaymentsMessage message = new PaymentsMessage(accountNumber, annualRate, numOfYears, ammount);
+                    RepaymentsReqMessage message = new RepaymentsReqMessage(accountNumber, annualRate, numOfYears, ammount);
                     toServer.write(message.convertToBytes());
 
-                    textArea.append("Radius is " + 65 + "\n");
-                    textArea.append("Area received from the server is \n");
+                    waitForResponse();
                 } catch (Exception ex) {
                     System.err.println(ex);
                 }
@@ -106,6 +106,23 @@ public class Client extends JFrame {
         }
     }
 
+    private void waitForResponse() {
+        while (true){
+            try {
+                if(fromServer.available() > 0){
+                    Message messageIn = MessageComms.readInMessage(fromServer);
+                    textArea.append("Message from Server: \n" +
+                            messageIn.prettyPrint() + "\n");
+
+                    System.out.println();
+                    break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+    }
 
 
     /**
@@ -162,7 +179,7 @@ public class Client extends JFrame {
         accNumTxt = new JTextField();
         accNumTxt.setName(accNumLbl.getText());
         accNumTxt.setInputVerifier(intVerifier);
-        accNumTxt.setText("1111");
+        accNumTxt.setText("1001");
         accPanel.add(accNumTxt);
 
         //Annual Interest Rate
@@ -177,7 +194,7 @@ public class Client extends JFrame {
         rateTxt = new JTextField();
         rateTxt.setName(rateLbl.getText());
         rateTxt.setInputVerifier(dblVerifier);
-        rateTxt.setText("2222");
+        rateTxt.setText("4");
         ratePanel.add(rateTxt);
 
         JPanel yearsPanel = new JPanel();
@@ -192,7 +209,7 @@ public class Client extends JFrame {
         yearsTxt = new JTextField();
         yearsTxt.setName(yearsLbl.getText());
         yearsTxt.setInputVerifier(intVerifier);
-        yearsTxt.setText("333");
+        yearsTxt.setText("5");
 
         yearsPanel.add(yearsTxt);
 
@@ -208,7 +225,7 @@ public class Client extends JFrame {
         amountTxt = new JTextField();
         amountTxt.setName(amountLbl.getText());
         amountTxt.setInputVerifier(dblVerifier);
-        amountTxt.setText("4444");
+        amountTxt.setText("14000");
         amountPanel.add(amountTxt);
 
         //Button

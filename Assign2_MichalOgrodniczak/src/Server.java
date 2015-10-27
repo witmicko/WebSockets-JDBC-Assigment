@@ -11,13 +11,13 @@ import java.util.Date;
  * Created by michal on 22/10/2015.
  */
 public class Server extends JFrame {
-    private static final String URL = "jdbc:mysql://localhost:3306/BankDatabase";
+    private static final String URL  = "jdbc:mysql://localhost:3306/BankDatabase";
     private static final String USER = "root";
     private static final String PASS = "";
 
     // Text area for displaying contents
-    protected JTextArea jta = new JTextArea();
-    protected SQL_driver sql_driver;
+    private JTextArea jta = new JTextArea();
+    private SQL_driver sql_driver;
     private ServerSocket serverSocket;
 
 
@@ -42,13 +42,16 @@ public class Server extends JFrame {
         setLayout(new BorderLayout());
         add(new JScrollPane(jta), BorderLayout.CENTER);
         setTitle("Server");
-        setSize(500, 300);
+        setSize(800, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true); // It is necessary to show the frame here!
     }
 
     /**
-     * Sets up DB connection, prints connection status to the main text area
+     * Sets up DB connection, prints connection status to the main text area.
+     * This is mainly for debugging and status monitoring as each thread will have its own jdbc connection.
+     * This pattern follows Oracle JDBC Developer's Guide and Reference
+     * (https://docs.oracle.com/cd/A87860_01/doc/java.817/a83724/tips1.htm)
      */
     private void setupSqlConnection() {
         sql_driver = new SQL_driver(URL, USER, PASS);
@@ -89,7 +92,7 @@ public class Server extends JFrame {
 
                 jta.append("Starting thread for client " + clientCtr + " " + new Date() + "\n");
 
-                MyClientThread c = new MyClientThread(socket, clientCtr, this);
+                MyClientThread c = new MyClientThread(socket, clientCtr, jta);
                 c.start();
             } catch (IOException ex) {
                 System.err.println(ex);

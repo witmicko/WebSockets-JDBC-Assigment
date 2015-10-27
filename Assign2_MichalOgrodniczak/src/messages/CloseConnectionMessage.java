@@ -8,4 +8,10 @@ public class CloseConnectionMessage extends TextMessage{
     public CloseConnectionMessage() {
         super("FIN");
     }
+
+
+    @Override
+    public String toString() {
+        return "CloseConnectionMessage{message=" + super.getMessage()+"}";
+    }
 }

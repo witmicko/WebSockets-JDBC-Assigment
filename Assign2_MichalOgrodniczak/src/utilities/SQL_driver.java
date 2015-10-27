@@ -6,9 +6,9 @@ import java.sql.*;
  * Created by witmi on 22/10/2015.
  */
 public class SQL_driver {
-    private String URL;
-    private String USER;
-    private String PASS;
+    private static String URL  = "jdbc:mysql://localhost:3306/BankDatabase";
+    private static String USER = "root";
+    private static String PASS = "";
 
     private Connection conn;
 
@@ -16,6 +16,10 @@ public class SQL_driver {
         this.URL  = URL;
         this.USER = USER;
         this.PASS = PASS;
+    }
+
+    public static SQL_driver defaultSqlDriverBuilder(){
+        return new SQL_driver(URL, USER, PASS);
     }
 
     public static void main(String[] args) throws SQLException {
@@ -43,7 +47,7 @@ public class SQL_driver {
         return connected;
     }
 
-    public String getApplicantByID(int id) {
+    public String getApplicantByID(int id) throws SQLException {
         PreparedStatement pstmt = null;
         String applicant = null;
         try {
@@ -57,13 +61,7 @@ public class SQL_driver {
                 String fName = rs.getString("FirstName");
                 String lName = rs.getString("LastName");
                 applicant = fName + " " + lName;
-            } else {
-                applicant = "Invalid account number";
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            applicant = "SQL error";
         } finally {
             try {
                 pstmt.close();
