@@ -1,7 +1,8 @@
 package messages;
 
 /**
- * Created by witmi on 26/10/2015.
+ * Created by Michal Ogrodniczak on 26/10/2015.
+ * Message sent when client is closing connection (on exit)
  */
 public class CloseConnectionMessage extends TextMessage{
 

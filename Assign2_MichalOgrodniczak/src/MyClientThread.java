@@ -16,7 +16,6 @@ import java.sql.SQLException;
  * Created by witmi on 23/10/2015.
  */
 public class MyClientThread extends Thread {
-
     //The socket the client is connected through
     private Socket socket;
     //The ip address of the client
@@ -106,9 +105,9 @@ public class MyClientThread extends Thread {
 
 
     /**
-     * Handles
-     * @param msg
-     * @return
+     * Handles incoming message and build up a response.
+     * @param msg Message from client
+     * @return  response to the message
      */
     private Message handleMessage(Message msg) {
         if(msg == null) return new TextMessage("Error, please resend the request");
@@ -124,13 +123,10 @@ public class MyClientThread extends Thread {
                 else                  return new RepaymentsRespMessage(applicant, repaymentsReqMessage);
             } catch (SQLException e) {
                 e.printStackTrace();
+                jta.append("Client " + clientName + " threw SQL exception on our database");
                 return new TextMessage("Database connection error, please try again at later stage");
             }
-
-
-
         }
-        System.out.println();
         return null;
     }
 
@@ -142,6 +138,8 @@ public class MyClientThread extends Thread {
         System.out.println("Closing client thread");
         try{
             socket.close();
+            inputFromClient.close();
+            outputToClient.close();
         } catch (IOException e) {
             //ignore close exception
         }

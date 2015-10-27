@@ -5,7 +5,9 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**
- * Created by witmi on 26/10/2015.
+ * Created by Michal Ogrodniczak on 26/10/2015.
+ *
+ * Verifies GUI form inputs.
  */
 public class FormVerifier extends InputVerifier{
     //Input validation regex

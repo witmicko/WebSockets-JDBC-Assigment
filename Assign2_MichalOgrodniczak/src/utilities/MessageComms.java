@@ -7,14 +7,15 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
- * Created by witmi on 27/10/2015.
+ * Created by Michal Ogrodniczak on 27/10/2015.
+ * Utility class to handle Message communications
  */
 public class MessageComms {
 
 
     /**
-     * reads in bytes from the input stream and returns a messages.Message object
-     * @return
+     * Reads in bytes from the input stream and returns a Message object
+     * @return Message object that was read in from the dataInputStream
      */
     public static Message readInMessage(DataInputStream inputStream) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

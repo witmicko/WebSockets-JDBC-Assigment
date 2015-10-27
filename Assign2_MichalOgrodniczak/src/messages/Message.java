@@ -3,7 +3,8 @@ package messages;
 import java.io.*;
 
 /**
- * Created by witmi on 26/10/2015.
+ * Created by Michal Ogrodniczak on 26/10/2015.
+ * super class, handles serialization
  */
 public class Message implements java.io.Serializable{
 

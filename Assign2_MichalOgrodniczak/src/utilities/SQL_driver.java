@@ -3,7 +3,8 @@ package utilities;
 import java.sql.*;
 
 /**
- * Created by witmi on 22/10/2015.
+ * Created by Michal Ogrodniczak on 22/10/2015.
+ * Utility class to handle MYSQL communications
  */
 public class SQL_driver {
     private static String URL  = "jdbc:mysql://localhost:3306/BankDatabase";
@@ -12,34 +13,41 @@ public class SQL_driver {
 
     private Connection conn;
 
+    /**
+     * Parametrised constructor
+     * @param URL url of the database
+     * @param USER username for the database
+     * @param PASS password for the user
+     */
     public SQL_driver(String URL, String USER, String PASS) {
         this.URL  = URL;
         this.USER = USER;
         this.PASS = PASS;
     }
 
+    /**
+     * Default builder method, this returns SQL driver that uses default connection parameters.
+     * @return
+     */
     public static SQL_driver defaultSqlDriverBuilder(){
         return new SQL_driver(URL, USER, PASS);
     }
 
     public static void main(String[] args) throws SQLException {
-        String URL  = "jdbc:mysql://localhost:3306/BankDatabase";
-        String USER = "root";
-        String PASS = "";
         SQL_driver m = new SQL_driver(URL, USER, PASS);
 
         m.conn = DriverManager.getConnection(URL, USER, PASS);
 
-        System.out.println(m.getApplicantByID(1002));
-
-
     }
 
+    /**
+     * Connects to te database.
+     * @return true if connection successful, false otherwise.
+     */
     public boolean connect() {
         boolean connected = false;
         try {
             conn = DriverManager.getConnection(URL, USER, PASS);
-
             connected = true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -47,6 +55,12 @@ public class SQL_driver {
         return connected;
     }
 
+    /**
+     * returns an user's first name and last name if they are in the database, null otherwise
+     * @param id id of the user we're searching for
+     * @return first name last name of the user
+     * @throws SQLException
+     */
     public String getApplicantByID(int id) throws SQLException {
         PreparedStatement pstmt = null;
         String applicant = null;
@@ -81,7 +95,4 @@ public class SQL_driver {
         return USER;
     }
 
-    public Connection getConn() {
-        return conn;
-    }
 }

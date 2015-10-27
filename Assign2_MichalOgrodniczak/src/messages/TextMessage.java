@@ -1,7 +1,8 @@
 package messages;
 
 /**
- * Created by witmi on 26/10/2015.
+ * Created by Michal Ogrodniczak on 26/10/2015.
+ * Simple message containing text message.
  */
 public class TextMessage extends Message {
     private String message;

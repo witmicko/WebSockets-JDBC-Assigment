@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Date;
 
 /**
- * Created by michal on 22/10/2015.
+ * Created by Michal Ogrodniczak on 22/10/2015.
  */
 public class Server extends JFrame {
     private static final String URL  = "jdbc:mysql://localhost:3306/BankDatabase";

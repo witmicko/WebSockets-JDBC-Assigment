@@ -1,7 +1,9 @@
 package messages;
 
 /**
- * Created by witmi on 26/10/2015.
+ * Created by Michal Ogrodniczak on 26/10/2015.
+ * Repayment request class, this type of message contains all data required to correctly calculate and process
+ * loan repayments calculations.
  */
 public class RepaymentsReqMessage extends Message{
     private int    accountNumber;

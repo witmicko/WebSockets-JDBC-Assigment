@@ -1,5 +1,6 @@
 /**
- * Created by michal on 22/10/2015.
+ * Created by Michal Ogrodniczak on 22/10/2015.
+ * Client class
  */
 
 import messages.CloseConnectionMessage;
@@ -35,18 +36,20 @@ public class Client extends JFrame {
     private DataInputStream fromServer;
     private Socket socket;
 
+    /**
+     * Client constructor, initiates GUI and server connection
+     */
+    public Client() {
+        buildGUI();
+        connectToServer();
+    }
+
     public static void main(String[] args) {
         Client client = new Client();
         client.setVisible(true);
     }
 
-    public Client() {
-        buildGUI();
-        connectToServer();
 
-
-
-    }
 
 
     /**
@@ -54,13 +57,10 @@ public class Client extends JFrame {
      */
     private void connectToServer() {
         try {
-            // Create a socket to connect to the server
             socket = new Socket("localhost", 8000);
 
-            // Create an input stream to receive data from the server
+            // Create an input output streams to receive and send data from and to the server
             fromServer = new DataInputStream(socket.getInputStream());
-
-            // Create an output stream to send data to the server
             toServer   = new DataOutputStream(socket.getOutputStream());
 
             InetAddress address = socket.getInetAddress();
@@ -106,15 +106,15 @@ public class Client extends JFrame {
         }
     }
 
+    /**
+     * waits for the server response, releases hold after it gets the message or IOException
+     */
     private void waitForResponse() {
         while (true){
             try {
                 if(fromServer.available() > 0){
                     Message messageIn = MessageComms.readInMessage(fromServer);
-                    textArea.append("Message from Server: \n" +
-                            messageIn.prettyPrint() + "\n");
-
-                    System.out.println();
+                    textArea.append("Message from Server: \n" + messageIn.prettyPrint() + "\n");
                     break;
                 }
             } catch (IOException e) {

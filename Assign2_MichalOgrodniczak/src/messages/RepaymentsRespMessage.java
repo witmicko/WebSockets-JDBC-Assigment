@@ -3,7 +3,9 @@ package messages;
 import java.text.DecimalFormat;
 
 /**
- * Created by witmi on 27/10/2015.
+ * Created by Michal Ogrodniczak on 27/10/2015.
+ * Repayment response message contains all information about loan repayment.
+ * It also includes Welcome message to the requesting applicant.
  */
 public class RepaymentsRespMessage extends TextMessage{
 
@@ -12,6 +14,12 @@ public class RepaymentsRespMessage extends TextMessage{
     private double totalPayment;
     private double interestPaid;
 
+
+    /**
+     * Constructor initiaties and performs all calculations
+     * @param applicant
+     * @param repaymentsReqMessage
+     */
     public RepaymentsRespMessage(String applicant, RepaymentsReqMessage repaymentsReqMessage) {
         super("Hello " + applicant + " your loan repayments are following:");
 
@@ -26,6 +34,7 @@ public class RepaymentsRespMessage extends TextMessage{
         double interestPaid = totalPayment - loanAmount;
 
         this.monthlyPayment = round(monthlyPayment);
+        this.numOfPayments  = numOfPayments;
         this.totalPayment   = round(totalPayment);
         this.interestPaid   = round(interestPaid);
 
@@ -41,9 +50,10 @@ public class RepaymentsRespMessage extends TextMessage{
 
     public String prettyPrint() {
         return
-                getMessage()                         + "\n" +
-                "monthly payment: " + monthlyPayment + "\n" +
-                "total payment: "   + totalPayment   + "\n" +
-                "interest paid: "   + interestPaid;
+                getMessage()                            + "\n" +
+                "monthly payment: "    + monthlyPayment + "\n" +
+                "number of payments: " + numOfPayments  + "\n" +
+                "total payment: "      + totalPayment   + "\n" +
+                "interest paid: "      + interestPaid;
     }
 }
