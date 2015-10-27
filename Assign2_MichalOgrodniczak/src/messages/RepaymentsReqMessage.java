@@ -12,12 +12,12 @@ public class RepaymentsReqMessage extends Message{
     private double loanAmount;
 
 
-    public RepaymentsReqMessage(int accountNumber, double rate, int years, double ammount) {
+    public RepaymentsReqMessage(int accountNumber, double rate, int years, double amount) {
 
         this.accountNumber = accountNumber;
         this.annualRate = rate;
         this.numOfYears = years;
-        this.loanAmount = ammount;
+        this.loanAmount = amount;
     }
 
     public int getAccountNumber() {

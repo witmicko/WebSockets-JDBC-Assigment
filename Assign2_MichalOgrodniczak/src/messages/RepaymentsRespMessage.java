@@ -16,9 +16,9 @@ public class RepaymentsRespMessage extends TextMessage{
 
 
     /**
-     * Constructor initiaties and performs all calculations
-     * @param applicant
-     * @param repaymentsReqMessage
+     * Constructor initiates and performs all calculations
+     * @param applicant of the request, holder of an account in out bank database
+     * @param repaymentsReqMessage reqyuest message with data necessary to calculate repayments
      */
     public RepaymentsRespMessage(String applicant, RepaymentsReqMessage repaymentsReqMessage) {
         super("Hello " + applicant + " your loan repayments are following:");

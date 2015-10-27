@@ -27,7 +27,7 @@ public class SQL_driver {
 
     /**
      * Default builder method, this returns SQL driver that uses default connection parameters.
-     * @return
+     * @return sql driver using default connection parameters
      */
     public static SQL_driver defaultSqlDriverBuilder(){
         return new SQL_driver(URL, USER, PASS);
@@ -79,7 +79,7 @@ public class SQL_driver {
         } finally {
             try {
                 pstmt.close();
-            } catch (SQLException e) {
+            } catch (NullPointerException | SQLException e) {
                 e.printStackTrace();
             }
         }

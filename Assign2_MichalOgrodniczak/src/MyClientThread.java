@@ -13,7 +13,8 @@ import java.sql.SQLException;
 
 
 /**
- * Created by witmi on 23/10/2015.
+ * Created by Michal Ogrodniczak on 23/10/2015.
+ * Thread class, being started from the server, handles client communication
  */
 public class MyClientThread extends Thread {
     //The socket the client is connected through
@@ -76,7 +77,9 @@ public class MyClientThread extends Thread {
 
                 if(inputFromClient.available() > 0){
                     Message messageIn = MessageComms.readInMessage(inputFromClient);
-                    jta.append("Message from Client " + clientName + "\n" +
+
+                    jta.append("Message from Client " + clientName + ": "
+                            + address.getHostName() + "@" + address.getHostAddress() + "\n" +
                             messageIn.toString() + "\n");
 
                     Message response = handleMessage(messageIn);

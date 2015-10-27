@@ -1,7 +1,12 @@
 import utilities.SQL_driver;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -40,10 +45,29 @@ public class Server extends JFrame {
     private void buildGUI() {
         // Place text area on the frame
         setLayout(new BorderLayout());
-        add(new JScrollPane(jta), BorderLayout.CENTER);
+        //scrolls to the last line of text area
+        jta.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                jta.setCaretPosition(jta.getDocument().getLength());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(jta);
+        add(scrollPane, BorderLayout.CENTER);
         setTitle("Server");
         setSize(800, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true); // It is necessary to show the frame here!
     }
 
@@ -95,7 +119,7 @@ public class Server extends JFrame {
                 MyClientThread c = new MyClientThread(socket, clientCtr, jta);
                 c.start();
             } catch (IOException ex) {
-                System.err.println(ex);
+                ex.printStackTrace();
             }
         }
     }

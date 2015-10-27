@@ -19,7 +19,7 @@ public class FormVerifier extends InputVerifier{
     /**
      * Constructor, takes String type as parameter to build the verifier - 'double' will verify decimal input - xx.xx,
      * otherwise it will verify integer inputs - xx
-     * @param type
+     * @param type of verification "double" to verify decimal, anything else for int
      */
     public FormVerifier(String type){
         regex = type.equals("double") ? doubleRegex : intRegex;

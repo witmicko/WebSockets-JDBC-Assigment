@@ -11,6 +11,8 @@ import utilities.MessageComms;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.DataInputStream;
@@ -87,16 +89,16 @@ public class Client extends JFrame {
                 int accountNumber = Integer.parseInt   (accNumTxt.getText());
                 double annualRate = Double .parseDouble(rateTxt.getText());
                 int    numOfYears = Integer.parseInt   (yearsTxt.getText());
-                double ammount    = Double .parseDouble(amountTxt.getText());
+                double amount    = Double .parseDouble(amountTxt.getText());
 
 
                 try {
-                    RepaymentsReqMessage message = new RepaymentsReqMessage(accountNumber, annualRate, numOfYears, ammount);
+                    RepaymentsReqMessage message = new RepaymentsReqMessage(accountNumber, annualRate, numOfYears, amount);
                     toServer.write(message.convertToBytes());
 
                     waitForResponse();
                 } catch (Exception ex) {
-                    System.err.println(ex);
+                    ex.printStackTrace();
                 }
             } else {
                 JOptionPane.showMessageDialog(
@@ -115,6 +117,11 @@ public class Client extends JFrame {
                 if(fromServer.available() > 0){
                     Message messageIn = MessageComms.readInMessage(fromServer);
                     textArea.append("Message from Server: \n" + messageIn.prettyPrint() + "\n");
+
+                    InetAddress address = socket.getInetAddress();
+                    textArea.append("Message from Bank`s server :" +
+                            address.getHostName()+"@"+address.getHostAddress()+
+                            ":\n" + messageIn.prettyPrint() + "\n");
                     break;
                 }
             } catch (IOException e) {
@@ -131,7 +138,7 @@ public class Client extends JFrame {
     private void buildGUI() {
         setSize(500, 300);
         setTitle("Client");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -139,10 +146,8 @@ public class Client extends JFrame {
                     Message message = new CloseConnectionMessage();
                     toServer.write(message.convertToBytes());
                     socket.close();
-                } catch (IOException e1) {
+                } catch (IOException | NullPointerException e1) {
                     e1.printStackTrace();
-                }catch (NullPointerException e2){
-                    e2.printStackTrace();
                 }
             }
         });
@@ -243,12 +248,26 @@ public class Client extends JFrame {
         textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2, true));
-        getContentPane().add(textArea, BorderLayout.CENTER);
+        getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
 
+        //scrolls to the last line of text area
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                textArea.setCaretPosition(textArea.getDocument().getLength());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
 
     }
-
-
-
 
 }
